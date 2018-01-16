@@ -1,0 +1,5 @@
+--- 
+name: ghostcoin
+urls:
+- http://ghostcoin.io/ghostcoin-latest-linux-gitian.zip
+minimum_weight: 120

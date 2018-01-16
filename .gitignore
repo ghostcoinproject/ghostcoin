@@ -1,0 +1,34 @@
+src/*.exe
+src/ghostcoin
+src/ghostcoind
+src/test_ghostcoin
+.*.swp
+*.*~*
+*.bak
+*.rej
+*.orig
+*.o
+*.patch
+.ghostcoin
+
+# Compilation and Qt preprocessor part
+*.qm
+Makefile
+ghostcoin-qt
+Ghostcoin-Qt.app
+
+# Unit-tests
+Makefile.test
+ghostcoin-qt_test
+
+# Resources cpp
+qrc_*.cpp
+
+# Qt creator
+*.pro.user
+
+# Mac specific
+.DS_Store
+build
+
+!src/leveldb*/Makefile

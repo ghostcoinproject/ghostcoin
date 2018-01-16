@@ -1,0 +1,5 @@
+--- 
+name: ghostcoin
+urls:
+- http://ghostcoin.io/ghostcoin-latest-win32-gitian.zip
+minimum_weight: 120

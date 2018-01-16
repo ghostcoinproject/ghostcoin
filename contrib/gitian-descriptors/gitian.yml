@@ -1,0 +1,68 @@
+---
+name: "ghostcoin"
+suites:
+- "precise"
+architectures:
+- "i386"
+- "amd64"
+packages: 
+- "qt4-qmake"
+- "libqt4-dev"
+- "libboost-system-dev"
+- "libboost-filesystem-dev"
+- "libboost-program-options-dev"
+- "libboost-thread-dev"
+- "libssl-dev"
+- "git-core"
+- "unzip"
+- "pkg-config"
+- "libpng12-dev"
+reference_datetime: "2011-01-30 00:00:00"
+remotes:
+- "url": "https://github.com/ghostcoin-project/ghostcoin.git"
+  "dir": "ghostcoin"
+files:
+- "miniupnpc-2.0.20170509.tar.gz"
+- "qrencode-3.4.4.tar.bz2"
+- "db-5.3.28.NC.tar.gz"
+script: |
+  INSTDIR="$HOME/install"
+  export LIBRARY_PATH="$INSTDIR/lib"
+  # Integrity Check
+  echo "d3c368627f5cdfb66d3ebd64ca39ba54d6ff14a61966dbecb8dd296b7039f16a  miniupnpc-2.0.20170509.tar.gz"   | sha256sum -c
+  echo "efe5188b1ddbcbf98763b819b146be6a90481aac30cfc8d858ab78a19cde1fa5  qrencode-3.4.4.tar.bz2" | sha256sum -c
+  echo "76a25560d9e52a198d37a31440fd07632b5f1f8f9f2b6d5438f4bc3e7c9013ef  db-5.3.28.NC.tar.gz" | sha256sum -c
+
+  #
+  tar xzf miniupnpc-2.0.20170509.tar.gz
+  cd miniupnpc-2.0.20170509
+  INSTALLPREFIX=$INSTDIR make $MAKEOPTS install
+  cd ..
+  #
+  tar xjf qrencode-3.4.4.tar.bz2
+  cd qrencode-3.4.4
+  ./configure --prefix=$INSTDIR --enable-static --disable-shared
+  make $MAKEOPTS install
+  cd ..
+  #
+  tar xzf db-5.3.28.NC.tar.gz
+  cd db-5.3.28.NC/build_unix
+  #   need --with-pic to avoid relocation error in 64 bit builds
+  ../dist/configure --prefix=$INSTDIR --enable-cxx --disable-shared --with-pic
+  make $MAKEOPTS library_build
+  make install_lib install_include
+  cd ../..
+  #
+  cd ghostcoin
+  mkdir -p $OUTDIR/src
+  git archive HEAD | tar -x -C $OUTDIR/src
+  cp $OUTDIR/src/doc/README.md $OUTDIR
+  cp $OUTDIR/src/COPYING $OUTDIR
+  cd src
+  make -f makefile.unix STATIC=1 OPENSSL_INCLUDE_PATH="$INSTDIR/include" OPENSSL_LIB_PATH="$INSTDIR/lib" $MAKEOPTS ghostcoind USE_UPNP=0 DEBUGFLAGS= USE_SSE2=1
+  mkdir -p $OUTDIR/bin/$GBUILD_BITS
+  install -s ghostcoind $OUTDIR/bin/$GBUILD_BITS
+  cd ..
+  qmake INCLUDEPATH="$INSTDIR/include" LIBS="-L$INSTDIR/lib" RELEASE=1 USE_QRCODE=1 USE_SSE2=1
+  make $MAKEOPTS
+  install ghostcoin-qt $OUTDIR/bin/$GBUILD_BITS
